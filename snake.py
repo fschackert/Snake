@@ -154,10 +154,10 @@ def play(player, update_game, update_level, level_progress, food_lifetime, grid_
 
     clock = pygame.time.Clock()
     game = Game(player, food_lifetime, grid_size, cell_size)
-    GAMEUPDATE = pygame.USEREVENT + 1
-    pygame.time.set_timer(GAMEUPDATE, update_game)
-    LEVELUPDATE = GAMEUPDATE + 1
+    LEVELUPDATE = pygame.USEREVENT + 1
     pygame.time.set_timer(LEVELUPDATE, update_level)
+    GAMEUPDATE = pygame.USEREVENT + 2
+    pygame.time.set_timer(GAMEUPDATE, update_game)
     width = height = grid_size * cell_size
     screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
     canvas = screen.copy()
