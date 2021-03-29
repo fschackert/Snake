@@ -149,14 +149,12 @@ class Game:
         self.snake.draw(surface)
 
 
-def play(player, update_game, update_level, level_progress, food_lifetime, grid_size, cell_size, framerate):
+def play(player, update_game, food_lifetime, grid_size, cell_size, framerate):
     pygame.init()
 
     clock = pygame.time.Clock()
     game = Game(player, food_lifetime, grid_size, cell_size)
-    LEVELUPDATE = pygame.USEREVENT + 1
-    pygame.time.set_timer(LEVELUPDATE, update_level)
-    GAMEUPDATE = pygame.USEREVENT + 2
+    GAMEUPDATE = pygame.USEREVENT + 1
     pygame.time.set_timer(GAMEUPDATE, update_game)
     width = height = grid_size * cell_size
     screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
@@ -175,11 +173,6 @@ def play(player, update_game, update_level, level_progress, food_lifetime, grid_
                     game.over()
                     pygame.quit()
                     sys.exit()
-            elif event.type == LEVELUPDATE:
-                update_game_previously = update_game
-                update_game = int(update_game / level_progress) + 1
-                if update_game_previously > update_game:
-                    pygame.time.set_timer(GAMEUPDATE, update_game)
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
                     direction = (0, -cell_size)
@@ -206,7 +199,5 @@ if __name__ == '__main__':
     GRID_SIZE = 30
     CELL_SIZE = 20
     UPDATE_GAME = 200
-    UPDATE_LEVEL = 20000
-    LEVEL_PROGRESS = 1.1
     FOOD_LIFETIME = 80
-    play(PLAYER, UPDATE_GAME, UPDATE_LEVEL, LEVEL_PROGRESS, FOOD_LIFETIME, GRID_SIZE, CELL_SIZE, FRAMERATE)
+    play(PLAYER, UPDATE_GAME, FOOD_LIFETIME, GRID_SIZE, CELL_SIZE, FRAMERATE)
