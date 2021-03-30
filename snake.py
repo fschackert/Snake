@@ -162,7 +162,10 @@ class Session:
         width = height = self.game.grid_size * self.game.cell_size
         screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
         canvas = screen.copy()
-
+        directions = {pygame.K_UP : (0, -1),
+                      pygame.K_DOWN : (0, 1),
+                      pygame.K_LEFT : (-1, 0),
+                      pygame.K_RIGHT : (1, 0)}
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -177,14 +180,7 @@ class Session:
                         pygame.quit()
                         sys.exit()
                 elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_UP:
-                        direction = (0, -1)
-                    elif event.key == pygame.K_DOWN:
-                        direction = (0, 1)
-                    elif event.key == pygame.K_LEFT:
-                        direction = (-1, 0)
-                    elif event.key == pygame.K_RIGHT:
-                        direction = (1, 0)
+                    direction = directions[event.key]
                     direction = (direction[0] * self.game.cell_size,
                                  direction[1] * self.game.cell_size)
                     self.game.snake.direction = direction
@@ -196,18 +192,15 @@ class Session:
             clock.tick(self.framerate)
 
 
-def main():
+if __name__ == '__main__':
     print('\n\n\n\n    :::::::: Welcome to SNAKE ::::::::\n\n')
     print('Your nickname')
     PLAYER = input('>>>> ')
     FRAMERATE = 60
-    UPDATE_FREQUENCY = 200
-    FOOD_LIFETIME = 70
-    GRID_SIZE = 30
-    CELL_SIZE = 20
+    UPDATE_FREQUENCY = 120
+    FOOD_LIFETIME = 75
+    GRID_SIZE = 50
+    CELL_SIZE = 10
     GAME = Game(FOOD_LIFETIME, GRID_SIZE, CELL_SIZE)
     SESSION = Session(PLAYER, GAME, UPDATE_FREQUENCY, FRAMERATE)
     SESSION.play()
-
-if __name__ == '__main__':
-    main()
