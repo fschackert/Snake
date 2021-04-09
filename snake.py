@@ -31,8 +31,7 @@ class Food(Part):
         self.age = 0
 
     def draw(self, surface, color=(200, 200, 200)):
-        rect = pygame.Rect(self.x, self.y, self.width, self.height)
-        pygame.draw.rect(surface, color, rect)
+        super().draw(surface, color)
 
 
 class Snake:
@@ -125,6 +124,24 @@ class Session:
         self.game = game
         self.update_frequency = update_frequency
         self.framerate = framerate
+        self.paused = False
+
+    directions = {pygame.K_UP : (0, -1),
+                  pygame.K_DOWN : (0, 1),
+                  pygame.K_LEFT : (-1, 0),
+                  pygame.K_RIGHT : (1, 0)}
+
+    def __get_command(self, key):
+        if key == pygame.K_SPACE:
+            self.paused = not self.paused
+        elif not self.paused:
+            try:
+                direction = self.directions[key]
+                direction = (direction[0] * self.game.cell_size,
+                             direction[1] * self.game.cell_size)
+                self.game.snake.direction = direction
+            except KeyError:
+                pass
 
     def __load_highscores(self):
         try:
@@ -134,7 +151,7 @@ class Session:
             scores = {self.player : 0}
         return scores
 
-    def update_highscores(self):
+    def __update_highscores(self):
         print(f'Your final length was {self.game.score}.')
         highscores_have_changed = False
         highscores = self.__load_highscores()
@@ -162,10 +179,7 @@ class Session:
         width = height = self.game.grid_size * self.game.cell_size
         screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
         canvas = screen.copy()
-        directions = {pygame.K_UP : (0, -1),
-                      pygame.K_DOWN : (0, 1),
-                      pygame.K_LEFT : (-1, 0),
-                      pygame.K_RIGHT : (1, 0)}
+
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -173,17 +187,14 @@ class Session:
                     sys.exit()
                 elif event.type == pygame.VIDEORESIZE:
                     width, height = event.size
-                elif event.type == GAMEUPDATE:
+                elif event.type == GAMEUPDATE and not self.paused:
                     game_over = self.game.update()
                     if game_over:
-                        self.update_highscores()
+                        self.__update_highscores()
                         pygame.quit()
                         sys.exit()
                 elif event.type == pygame.KEYDOWN:
-                    direction = directions[event.key]
-                    direction = (direction[0] * self.game.cell_size,
-                                 direction[1] * self.game.cell_size)
-                    self.game.snake.direction = direction
+                    self.__get_command(event.key)
 
             canvas.fill((0, 0, 0))
             self.game.draw(canvas)
@@ -198,9 +209,9 @@ if __name__ == '__main__':
     PLAYER = input('>>>> ')
     FRAMERATE = 60
     UPDATE_FREQUENCY = 120
-    FOOD_LIFETIME = 75
+    FOOD_LIFETIME = 70
     GRID_SIZE = 50
-    CELL_SIZE = 10
+    CELL_SIZE = 12
     GAME = Game(FOOD_LIFETIME, GRID_SIZE, CELL_SIZE)
     SESSION = Session(PLAYER, GAME, UPDATE_FREQUENCY, FRAMERATE)
     SESSION.play()
